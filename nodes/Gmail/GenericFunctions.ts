@@ -1,25 +1,19 @@
-import isEmpty from 'lodash/isEmpty';
-import { DateTime } from 'luxon';
-import { simpleParser } from 'mailparser';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type {
 	IBinaryKeyData,
 	IDataObject,
 	IExecuteFunctions,
 	IHttpRequestMethods,
+	IHttpRequestOptions,
 	ILoadOptionsFunctions,
 	INode,
 	INodeExecutionData,
 	INodePropertyOptions,
 	IPollFunctions,
-	IRequestOptions,
-	JsonObject,
+	JsonObject
 } from 'n8n-workflow';
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
-import MailComposer from 'nodemailer/lib/mail-composer';
-
-import type { IEmail } from '../../../utils/sendAndWait/interfaces';
-import { createUtmCampaignLink, escapeHtml } from '../../../utils/utilities';
-import { getGoogleAccessToken } from '../GenericFunctions';
 
 export interface IAttachments {
 	type: string;
@@ -36,7 +30,7 @@ export async function googleApiRequest(
 	uri?: string,
 	option: IDataObject = {},
 ) {
-	let options: IRequestOptions = {
+	let options: IHttpRequestOptions = {
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
@@ -44,10 +38,7 @@ export async function googleApiRequest(
 		method,
 		body,
 		qs,
-		uri: uri || `https://www.googleapis.com${endpoint}`,
-		qsStringifyOptions: {
-			arrayFormat: 'repeat',
-		},
+		url: uri || `https://www.googleapis.com${endpoint}`,
 		json: true,
 	};
 
@@ -58,21 +49,10 @@ export async function googleApiRequest(
 			delete options.body;
 		}
 
-		let credentialType = 'gmailOAuth2';
-		const authentication = this.getNodeParameter('authentication', 0) as string;
 
-		if (authentication === 'serviceAccount') {
-			const credentials = await this.getCredentials('googleApi');
-			credentialType = 'googleApi';
 
-			const { access_token } = await getGoogleAccessToken.call(this, credentials, 'gmail');
-
-			(options.headers as IDataObject).Authorization = `Bearer ${access_token}`;
-		}
-
-		const response = await this.helpers.requestWithAuthentication.call(
+		const response = await this.helpers.httpRequest.call(
 			this,
-			credentialType,
 			options,
 		);
 		return response;
@@ -86,9 +66,8 @@ export async function googleApiRequest(
 				const resource = this.getNodeParameter('resource', 0) as string;
 				const errorOptions = {
 					message: `Invalid ${resource} ID`,
-					description: `${
-						resource.charAt(0).toUpperCase() + resource.slice(1)
-					} IDs should look something like this: 182b676d244938bd`,
+					description: `${resource.charAt(0).toUpperCase() + resource.slice(1)
+						} IDs should look something like this: 182b676d244938bd`,
 				};
 				throw new NodeApiError(this.getNode(), error as JsonObject, errorOptions);
 			}
@@ -150,7 +129,7 @@ export async function parseRawEmail(
 	dataPropertyNameDownload: string,
 ): Promise<INodeExecutionData> {
 	const messageEncoded = Buffer.from(messageData.raw as string, 'base64').toString('utf8');
-	const responseData = await simpleParser(messageEncoded);
+	const responseData = messageEncoded as any;//await simpleParser(messageEncoded);
 
 	const headers: IDataObject = {};
 	for (const header of responseData.headerLines) {
@@ -206,7 +185,7 @@ export async function parseRawEmail(
 // for more info on MIME, https://docs.microsoft.com/en-us/previous-versions/office/developer/exchange-server-2010/aa494197(v%3Dexchg.140)
 //------------------------------------------------------------------------------------------------------------------------------------------
 
-export async function encodeEmail(email: IEmail) {
+export async function encodeEmail(email: any) {
 	// https://nodemailer.com/extras/mailcomposer/#e-mail-message-fields
 	const mailOptions = {
 		from: email.from,
@@ -230,7 +209,7 @@ export async function encodeEmail(email: IEmail) {
 		Array.isArray(email.attachments) &&
 		email.attachments.length > 0
 	) {
-		const attachments = email.attachments.map((attachment) => ({
+		const attachments = email.attachments.map((attachment: any) => ({
 			filename: attachment.name,
 			content: attachment.content,
 			contentType: attachment.type,
@@ -240,7 +219,7 @@ export async function encodeEmail(email: IEmail) {
 		mailOptions.attachments = attachments;
 	}
 
-	const mail = new MailComposer(mailOptions).compile();
+	const mail = mailOptions as any;//new MailComposer(mailOptions).compile();
 
 	// by default the bcc headers are deleted when the mail is built.
 	// So add keepBcc flag to override such behaviour. Only works when
@@ -287,14 +266,12 @@ export const prepareTimestamp = (
 	node: INode,
 	itemIndex: number,
 	query: string,
-	dateValue: string | number | DateTime,
+	dateValue: string | number,
 	label: 'after' | 'before',
 ) => {
-	if (dateValue instanceof DateTime) {
-		dateValue = dateValue.toISO();
-	}
 
-	let timestamp = DateTime.fromISO(dateValue as string).toSeconds();
+
+	let timestamp = new Date(dateValue as string).getTime() / 1000;
 	const timestampLengthInMilliseconds1990 = 12;
 
 	if (typeof timestamp === 'number') {
@@ -313,9 +290,6 @@ export const prepareTimestamp = (
 		timestamp = parseInt(dateValue as string, 10);
 	}
 
-	if (!timestamp) {
-		timestamp = Math.floor(DateTime.fromMillis(parseInt(dateValue as string, 10)).toSeconds());
-	}
 
 	if (!timestamp) {
 		const description = `'${dateValue}' isn't a valid date and time. If you're using an expression, be sure to set an ISO date string or a timestamp.`;
@@ -433,7 +407,7 @@ export function prepareEmailBody(
 
 	if (appendAttribution) {
 		const attributionText = 'This email was sent automatically with ';
-		const link = createUtmCampaignLink('n8n-nodes-base.gmail', instanceId);
+		const link = 'https://unitalk.ai/?instanceId=' + instanceId;//createUtmCampaignLink('n8n-nodes-base.gmail', instanceId);
 		if (emailType === 'html') {
 			message = `
 			${message}
@@ -441,10 +415,10 @@ export function prepareEmailBody(
 			<br>
 			---
 			<br>
-			<em>${attributionText}<a href="${link}" target="_blank">n8n</a></em>
+			<em>${attributionText}<a href="${link}" target="_blank">Unitalk</a></em>
 			`;
 		} else {
-			message = `${message}\n\n---\n${attributionText}n8n\n${'https://n8n.io'}`;
+			message = `${message}\n\n---\n${attributionText}Unitalk\n${'https://unitalk.ai'}`;
 		}
 	}
 
@@ -470,7 +444,7 @@ export async function prepareEmailAttachments(
 	const attachmentsList: IDataObject[] = [];
 	const attachments = options.attachmentsBinary as IDataObject[];
 
-	if (attachments && !isEmpty(attachments)) {
+	if (attachments && attachments.length > 0) {
 		for (const { property } of attachments) {
 			for (const name of (property as string).split(',')) {
 				const binaryData = this.helpers.assertBinaryData(itemIndex, name);
@@ -499,7 +473,7 @@ export function unescapeSnippets(items: INodeExecutionData[]) {
 	const result = items.map((item) => {
 		const snippet = item.json.snippet as string;
 		if (snippet) {
-			item.json.snippet = escapeHtml(snippet);
+			item.json.snippet = snippet;//escapeHtml(snippet);
 		}
 		return item;
 	});

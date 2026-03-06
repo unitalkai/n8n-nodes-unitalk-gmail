@@ -1,7 +1,7 @@
-import uniq from 'lodash/uniq';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { NodeOperationError, type IDataObject, type IExecuteFunctions } from 'n8n-workflow';
 
-import type { IEmail } from '@utils/sendAndWait/interfaces';
 
 import {
 	encodeEmail,
@@ -119,9 +119,9 @@ export async function replyToEmail(
 		from = `${options.senderName as string} <${emailAddress}>`;
 	}
 
-	const toString = uniq(to).join(', ');
+	const toString = [...new Set(to)].join(', ');
 
-	const email: IEmail = {
+	const email: any = {
 		from,
 		to: toString,
 		cc,

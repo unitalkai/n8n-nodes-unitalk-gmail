@@ -1,10 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { IExecuteFunctions } from 'n8n-workflow';
-
-import type { IEmail } from '@utils/sendAndWait/interfaces';
 
 import { googleApiRequest } from '../../GenericFunctions';
 
-function setEmailReplyHeaders(email: IEmail, messageId: string | undefined): void {
+function setEmailReplyHeaders(email: any, messageId: string | undefined): void {
 	if (messageId) {
 		email.inReplyTo = messageId;
 		email.references = messageId;
@@ -12,7 +11,7 @@ function setEmailReplyHeaders(email: IEmail, messageId: string | undefined): voi
 }
 
 function setThreadHeaders(
-	email: IEmail,
+	email: any,
 	thread: { messages: Array<{ payload: { headers: Array<{ name: string; value: string }> } }> },
 ): void {
 	if (thread?.messages) {
@@ -31,7 +30,7 @@ function setThreadHeaders(
  */
 export async function addThreadHeadersToEmail(
 	this: IExecuteFunctions,
-	email: IEmail,
+	email: any,
 	threadId: string,
 ): Promise<void> {
 	const thread = await googleApiRequest.call(

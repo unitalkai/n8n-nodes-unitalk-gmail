@@ -1,4 +1,5 @@
-import { DateTime } from 'luxon';
+/* eslint-disable n8n-nodes-base/node-param-collection-type-unsorted-items */
+
 import type {
 	IDataObject,
 	ILoadOptionsFunctions,
@@ -269,12 +270,12 @@ export class GmailTrigger implements INodeType {
 			nodeStaticData = dictionary[nodeName];
 		}
 
-		const now = Math.floor(DateTime.now().toSeconds()).toString();
+		const now = Math.floor(new Date().getTime() / 1000);
 
 		if (this.getMode() !== 'manual') {
-			nodeStaticData.lastTimeChecked ??= +now;
+			nodeStaticData.lastTimeChecked ??= now;
 		}
-		const startDate = nodeStaticData.lastTimeChecked ?? +now;
+		const startDate = nodeStaticData.lastTimeChecked ?? now;
 
 		const options = this.getNodeParameter('options', {}) as GmailTriggerOptions;
 		const filters = this.getNodeParameter('filters', {}) as GmailTriggerFilters;
@@ -395,9 +396,9 @@ export class GmailTrigger implements INodeType {
 			if (email.internalDate) {
 				date = +email.internalDate / 1000;
 			} else if (email.date) {
-				date = +DateTime.fromJSDate(new Date(email.date)).toSeconds();
+				date = Math.floor(new Date(email.date).getTime() / 1000);
 			} else if (email.headers?.date) {
-				date = +DateTime.fromJSDate(new Date(email.headers.date)).toSeconds();
+				date = Math.floor(new Date(email.headers.date).getTime() / 1000);
 			}
 
 			if (!date || isNaN(date)) {

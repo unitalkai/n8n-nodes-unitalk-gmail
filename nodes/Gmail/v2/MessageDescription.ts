@@ -1,6 +1,7 @@
+/* eslint-disable n8n-nodes-base/node-param-collection-type-unsorted-items */
 import { SEND_AND_WAIT_OPERATION, type INodeProperties } from 'n8n-workflow';
 
-import { appendAttributionOption } from '../../../../utils/descriptions';
+// import { appendAttributionOption } from '../utils/descriptions';
 
 export const messageOperations: INodeProperties[] = [
 	{
@@ -207,9 +208,12 @@ export const messageFields: INodeProperties[] = [
 		default: {},
 		options: [
 			{
-				...appendAttributionOption,
+				displayName: 'Append Unitalk Attribution',
+				name: 'appendAttribution',
+				type: 'boolean',
+				default: true,
 				description:
-					'Whether to include the phrase “This email was sent automatically with n8n” to the end of the email',
+					'Whether to include the phrase “This email was sent automatically with unitalk to the end of the email',
 			},
 			{
 				displayName: 'Attachments',
