@@ -21,29 +21,20 @@ import { addThreadHeadersToEmail } from './v2/utils/draft';
 
 
 const preBuiltAgentsCallout: INodeProperties = {
-	// eslint-disable-next-line n8n-nodes-base/node-param-display-name-miscased
-	displayName: 'Sort your Gmail inbox using our pre-built',
+	displayName: 'Make sure you connected your Gmail account to Unitalk',
 	name: 'preBuiltAgentsCalloutGmail',
-	type: 'callout',
-	typeOptions: {
-		calloutAction: {
-			label: 'Email triage agent',
-			icon: 'bot',
-			type: 'openSampleWorkflowTemplate',
-			templateId: 'email_triage_agent_with_gmail',
-		},
-	},
+	type: 'notice',
 	default: '',
 };
 
 const versionDescription: INodeTypeDescription = {
 	displayName: 'Unitalk Gmail',
 	name: 'unitalkGmail',
-	icon: { light: 'file:unitalk.svg', dark: 'file:unitalk.dark.svg' },
+	icon: { light: 'file:gmail.svg', dark: 'file:gmail.svg' },
 	group: ['transform'],
 	version: [2, 2.1],
 	subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
-	description: 'Consume the Gmail API',
+	description: 'Consume the Gmail API with Unitalk',
 	defaults: {
 		name: 'Gmail',
 	},
@@ -58,22 +49,6 @@ const versionDescription: INodeTypeDescription = {
 	],
 	properties: [
 		preBuiltAgentsCallout,
-		{
-			displayName: 'Authentication',
-			name: 'authentication',
-			type: 'options',
-			options: [
-				{
-					name: 'OAuth2 (Recommended)',
-					value: 'oAuth2',
-				},
-				{
-					name: 'Service Account',
-					value: 'serviceAccount',
-				},
-			],
-			default: 'oAuth2',
-		},
 		{
 			displayName: 'Resource',
 			name: 'resource',

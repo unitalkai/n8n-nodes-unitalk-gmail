@@ -1,3 +1,4 @@
+/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-limit */
 /* eslint-disable n8n-nodes-base/node-param-collection-type-unsorted-items */
 import type { INodeProperties } from 'n8n-workflow';
 
@@ -296,7 +297,7 @@ export const threadFields: INodeProperties[] = [
 			minValue: 1,
 			maxValue: 500,
 		},
-		default: 50,
+		default: 10,
 		description: 'Max number of results to return',
 	},
 	{

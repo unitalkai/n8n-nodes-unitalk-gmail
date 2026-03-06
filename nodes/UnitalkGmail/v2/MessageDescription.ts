@@ -1,3 +1,4 @@
+/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-limit */
 /* eslint-disable n8n-nodes-base/node-param-collection-type-unsorted-items */
 import { SEND_AND_WAIT_OPERATION, type INodeProperties } from 'n8n-workflow';
 
@@ -370,7 +371,7 @@ export const messageFields: INodeProperties[] = [
 			minValue: 1,
 			maxValue: 500,
 		},
-		default: 50,
+		default: 10,
 		description: 'Max number of results to return',
 	},
 	{

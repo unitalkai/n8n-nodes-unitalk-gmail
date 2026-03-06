@@ -1,3 +1,4 @@
+/* eslint-disable n8n-nodes-base/node-param-default-wrong-for-limit */
 import type { INodeProperties } from 'n8n-workflow';
 
 export const draftOperations: INodeProperties[] = [
@@ -268,7 +269,7 @@ export const draftFields: INodeProperties[] = [
 			minValue: 1,
 			maxValue: 500,
 		},
-		default: 50,
+		default: 10,
 		description: 'Max number of results to return',
 	},
 	{

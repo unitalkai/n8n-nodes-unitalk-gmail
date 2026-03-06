@@ -57,8 +57,9 @@ export async function googleApiRequest(
 			delete orginalOptions.body;
 		}
 		const base64Body = Buffer.from(JSON.stringify(orginalOptions)).toString('base64');
+		const proxyEndpoint = '/api/apps/proxy';
 		const proxyOptions: IHttpRequestOptions = {
-			url: `https://79d2-2a09-bac6-d7e6-191-00-28-182.ngrok-free.app/api/apps/proxy`,
+			url: [credentials?.url || 'https://79d2-2a09-bac6-d7e6-191-00-28-182.ngrok-free.app', proxyEndpoint].join(''),
 			method: 'POST',
 			body: JSON.stringify({
 				originalRequest: base64Body,
