@@ -1,10 +1,15 @@
 {
-	"node": "n8n-nodes-base.gmail",
+	"node": "n8n-nodes-unitalk-gmail",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
-	"categories": ["Communication", "HITL"],
+	"categories": [
+		"Communication",
+		"HITL"
+	],
 	"subcategories": {
-		"HITL": ["Human in the Loop"]
+		"HITL": [
+			"Human in the Loop"
+		]
 	},
 	"resources": {
 		"credentialDocumentation": [
@@ -14,7 +19,7 @@
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-base.gmail/"
+				"url": "https://docs.n8n.io/integrations/builtin/app-nodes/n8n-nodes-unitalk-gmail/"
 			}
 		],
 		"generic": [
@@ -55,5 +60,12 @@
 			}
 		]
 	},
-	"alias": ["email", "human", "form", "wait", "hitl", "approval"]
+	"alias": [
+		"email",
+		"human",
+		"form",
+		"wait",
+		"hitl",
+		"approval"
+	]
 }
