@@ -1,5 +1,11 @@
+/* eslint-disable @n8n/community-nodes/no-restricted-imports */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { DateTime } from 'luxon';
+// @ts-ignore
+import { simpleParser } from 'mailparser';
 
+// import { simpleParser } from 'mailparser';
 import type {
 	IBinaryKeyData,
 	IDataObject,
@@ -14,6 +20,8 @@ import type {
 	JsonObject
 } from 'n8n-workflow';
 import { NodeApiError, NodeOperationError } from 'n8n-workflow';
+// @ts-ignore
+import MailComposer from 'nodemailer/lib/mail-composer';
 
 export interface IAttachments {
 	type: string;
@@ -140,7 +148,7 @@ export async function parseRawEmail(
 	dataPropertyNameDownload: string,
 ): Promise<INodeExecutionData> {
 	const messageEncoded = Buffer.from(messageData.raw as string, 'base64').toString('utf8');
-	const responseData = messageEncoded as any;//await simpleParser(messageEncoded);
+	const responseData = await simpleParser(messageEncoded);
 
 	const headers: IDataObject = {};
 	for (const header of responseData.headerLines) {
@@ -230,7 +238,7 @@ export async function encodeEmail(email: any) {
 		mailOptions.attachments = attachments;
 	}
 
-	const mail = mailOptions as any;//new MailComposer(mailOptions).compile();
+	const mail = new MailComposer(mailOptions).compile();
 
 	// by default the bcc headers are deleted when the mail is built.
 	// So add keepBcc flag to override such behaviour. Only works when
@@ -277,12 +285,16 @@ export const prepareTimestamp = (
 	node: INode,
 	itemIndex: number,
 	query: string,
-	dateValue: string | number,
+	dateValue: string | number | DateTime,
 	label: 'after' | 'before',
 ) => {
+	if (dateValue instanceof DateTime) {
+		dateValue = dateValue.toISO() as string;
+	} else if (typeof dateValue === 'string') {
+		dateValue = DateTime.fromISO(dateValue).toSeconds();
+	}
 
-
-	let timestamp = new Date(dateValue as string).getTime() / 1000;
+	let timestamp = dateValue as number;
 	const timestampLengthInMilliseconds1990 = 12;
 
 	if (typeof timestamp === 'number') {
@@ -301,6 +313,9 @@ export const prepareTimestamp = (
 		timestamp = parseInt(dateValue as string, 10);
 	}
 
+	if (!timestamp) {
+		timestamp = Math.floor(DateTime.fromMillis(parseInt(dateValue as string, 10)).toSeconds());
+	}
 
 	if (!timestamp) {
 		const description = `'${dateValue}' isn't a valid date and time. If you're using an expression, be sure to set an ISO date string or a timestamp.`;
