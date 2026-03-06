@@ -30,7 +30,7 @@ export async function googleApiRequest(
 	uri?: string,
 	option: IDataObject = {},
 ) {
-	let options: IHttpRequestOptions = {
+	let orginalOptions: IHttpRequestOptions = {
 		headers: {
 			Accept: 'application/json',
 			'Content-Type': 'application/json',
@@ -42,18 +42,29 @@ export async function googleApiRequest(
 		json: true,
 	};
 
-	options = Object.assign({}, options, option);
-
+	orginalOptions = Object.assign({}, orginalOptions, option);
+	const credentials = await this.getCredentials('unitalkGmailApi');
 	try {
 		if (Object.keys(body).length === 0) {
-			delete options.body;
+			delete orginalOptions.body;
 		}
-
-
-
+		const base64Body = Buffer.from(JSON.stringify(orginalOptions)).toString('base64');
+		const proxyOptions: IHttpRequestOptions = {
+			url: `https://79d2-2a09-bac6-d7e6-191-00-28-182.ngrok-free.app/api/apps/proxy`,
+			method: 'POST',
+			body: JSON.stringify({
+				originalRequest: base64Body,
+			}),
+			headers: {
+				...orginalOptions.headers,
+				'X-Unitalk-API-Key': credentials?.apiKey,
+				'Content-Type': 'application/json',
+				'Accept': 'application/json',
+			},
+		};
 		const response = await this.helpers.httpRequest.call(
 			this,
-			options,
+			proxyOptions,
 		);
 		return response;
 	} catch (error) {

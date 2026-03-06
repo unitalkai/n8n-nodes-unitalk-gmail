@@ -3,7 +3,7 @@
     "version": "0.1.0",
     "description": "Unitalk Gmail Node for n8n",
     "license": "MIT",
-    "homepage": "https://github.com/unitalk-dev/n8n-nodes-unitalk-gmail",
+    "homepage": "https://github.com/unitalkai/n8n-nodes-unitalk-gmail",
     "keywords": [
         "n8n-community-node-package",
         "unitalk",
@@ -11,7 +11,7 @@
     ],
     "author": {
         "name": "Unitalk",
-        "email": "info@unitalk.com"
+        "email": "support@unitalk.ai"
     },
     "scripts": {
         "build": "n8n-node build",
